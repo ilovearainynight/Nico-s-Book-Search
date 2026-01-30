@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nico's Book Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #ffffff;
+      --bg-accent: #f0ebe3;
+      --text-primary: #2d2a26;
+      --text-secondary: #5c5856;
+      --text-muted: #9a9590;
+      --accent: #b8532f;
+      --accent-hover: #9a4527;
+      --accent-light: #f4e8e4;
+      --border: #e5e0d8;
+      --shadow: rgba(45, 42, 38, 0.08);
+      --success: #3d7c47;
+      --success-light: #e8f5ea;
+      --warning: #c4890c;
+      --warning-light: #fef6e6;
+      --info: #2563eb;
+      --info-light: #dbeafe;
+    }
+
+    .dark-mode {
+      --bg-primary: #1a1917;
+      --bg-secondary: #252321;
+      --bg-accent: #2f2c28;
+      --text-primary: #f0ebe3;
+      --text-secondary: #b8b3ac;
+      --text-muted: #7a756e;
+      --accent: #e07850;
+      --accent-hover: #c4673f;
+      --accent-light: #3d2a22;
+      --border: #3d3935;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --success: #5cb86a;
+      --success-light: #1e2e20;
+      --warning: #e0a82e;
+      --warning-light: #2e2818;
+      --info: #60a5fa;
+      --info-light: #1e3a5f;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 6rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-accent);
+      color: var(--text-primary);
+    }
+
+    .search-card {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 12px var(--shadow);
+      margin-bottom: 1.25rem;
+    }
+
+    .search-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input-group input {
+      padding: 0.75rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .input-group input::placeholder { color: var(--text-muted); }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      padding: 0.875rem 1.25rem;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+    .btn-secondary {
+      background: var(--bg-accent);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { background: var(--border); }
+
+    .results-section { display: none; }
+    .results-section.active {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .book-info {
+      background: var(--bg-secondary);
+      border-radius: 14px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .book-cover {
+      width: 70px;
+      height: 105px;
+      border-radius: 6px;
+      background: var(--bg-accent);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      overflow: hidden;
+    }
+
+    .book-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .book-details { flex: 1; min-width: 0; }
+
+    .book-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-author {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .book-isbn {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .results-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .in-store-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.625rem;
+      background: var(--warning-light);
+      color: var(--warning);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 1rem 0 0.5rem;
+      padding-left: 0.25rem;
+    }
+
+    .section-label:first-of-type { margin-top: 0.5rem; }
+
+    .price-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .price-card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px var(--shadow);
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid transparent;
+    }
+
+    .price-card:hover {
+      border-color: var(--border);
+      transform: translateX(2px);
+    }
+
+    .price-card.aggregator {
+      background: var(--info-light);
+      border-color: var(--info);
+    }
+
+    .price-card.aggregator:hover { filter: brightness(0.95); }
+
+    .price-card.has-price {
+      border-color: var(--success);
+      background: var(--success-light);
+    }
+
+    .price-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .site-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .price-card.aggregator .site-icon {
+      background: var(--info);
+      color: white;
+    }
+
+    .site-info { min-width: 0; }
+
+    .site-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .priority-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .site-note {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.125rem;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+    }
+
+    .price-value {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .price-value.click {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .price-condition {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .price-savings {
+      font-size: 0.7rem;
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 0.625rem;
+      margin-top: 1rem;
+    }
+
+    .action-row .btn { flex: 1; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.75rem 1rem;
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0));
+      z-index: 50;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.375rem 1rem;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      position: relative;
+    }
+
+    .nav-item .nav-icon { font-size: 1.25rem; }
+    .nav-item.active { color: var(--accent); }
+
+    .nav-badge {
+      position: absolute;
+      top: 0;
+      right: 0.5rem;
+      background: var(--accent);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 0.125rem 0.375rem;
+      border-radius: 10px;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .watchlist-section { display: none; }
+    .watchlist-section.active { display: block; }
+
+    .watchlist-empty {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .watchlist-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
+    }
+
+    .watchlist-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .watchlist-item {
+      background: var(--bg-secondary);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .watchlist-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .watchlist-item-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .watchlist-item-author {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.125rem;
+    }
+
+    .watchlist-item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.625rem;
+      padding-top: 0.625rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .meta-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-accent);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .meta-tag.in-store {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .watchlist-actions {
+      display: flex;
+      gap: 0.375rem;
+      margin-left: auto;
+    }
+
+    .watchlist-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .watchlist-btn:hover {
+      background: var(--bg-accent);
+      color: var(--text-primary);
+    }
+
+    .watchlist-btn.danger:hover {
+      background: #fde8e8;
+      color: #c53030;
+      border-color: #feb2b2;
+    }
+
+    .dark-mode .watchlist-btn.danger:hover {
+      background: #3d2020;
+      color: #fc8181;
+      border-color: #822727;
+    }
+
+    .watchlist-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border-radius: 20px 20px 0 0;
+      padding: 1.5rem;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUpModal 0.3s ease;
+    }
+
+    @keyframes slideUpModal {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 1rem;
+    }
+
+    .modal-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .modal-actions .btn { flex: 1; }
+
+    .random-pick-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .random-pick-overlay.active { display: flex; }
+
+    .random-pick-card {
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      max-width: 320px;
+      margin: 1rem;
+      animation: popIn 0.4s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .random-pick-emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: bounce 0.6s ease infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    .random-pick-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .random-pick-author {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 150;
+      max-width: calc(100% - 2rem);
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+
+    .watchlist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .watchlist-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .watchlist-tools {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sort-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .expand-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.625rem;
+      background: var(--bg-accent);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .expand-toggle:hover {
+      background: var(--border);
+      color: var(--text-primary);
+    }
+
+    .more-sites { display: none; }
+    .more-sites.expanded {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Nico's <span>Book Search</span></div>
+      <div class="header-actions">
+        <button class="icon-btn" id="dark-mode-toggle" title="Toggle dark mode">🌙</button>
+      </div>
+    </header>
+
+    <section id="search-section">
+      <div class="search-card">
+        <form class="search-form" id="search-form">
+          <div class="input-group">
+            <label for="title">Book Title</label>
+            <input type="text" id="title" placeholder="e.g., Being and Time" autocomplete="off">
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="author">Author</label>
+              <input type="text" id="author" placeholder="e.g., Heidegger" autocomplete="off">
+            </div>
+            <div class="input-group">
+              <label for="isbn">ISBN</label>
+              <input type="text" id="isbn" placeholder="9780061575594" autocomplete="off" inputmode="numeric">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="in-store-price">In-Store Price (to beat)</label>
+            <input type="text" id="in-store-price" placeholder="$18.99" inputmode="decimal">
+          </div>
+          <button type="submit" class="btn btn-primary" id="search-btn">
+            <span>🔍</span> Search Prices
+          </button>
+        </form>
+      </div>
+
+      <div class="results-section" id="results-section">
+        <div class="book-info" id="book-info">
+          <div class="book-cover" id="book-cover">📚</div>
+          <div class="book-details">
+            <div class="book-title" id="result-title">Book Title</div>
+            <div class="book-author" id="result-author">Author</div>
+            <div class="book-isbn" id="result-isbn">ISBN</div>
+          </div>
+        </div>
+
+        <div class="results-header">
+          <span class="results-title">Compare Prices</span>
+          <span class="in-store-tag hidden" id="in-store-tag">🏷️ Beat: <span id="in-store-display">$0</span></span>
+        </div>
+
+        <div class="section-label">⭐ Price Aggregators (find cheapest across all)</div>
+        <div class="price-cards" id="aggregator-cards"></div>
+
+        <div class="section-label">🔖 Your Priority Sites</div>
+        <div class="price-cards" id="priority-cards"></div>
+
+        <div class="section-label">📚 More Bookstores</div>
+        <div class="price-cards" id="secondary-cards"></div>
+        
+        <div class="more-sites" id="more-sites"></div>
+        <button class="expand-toggle" id="expand-toggle">
+          <span id="expand-text">Show 6 more sites</span>
+          <span id="expand-icon">▼</span>
+        </button>
+
+        <div class="action-row">
+          <button class="btn btn-secondary" id="add-watchlist-btn">📋 Save to Watchlist</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="watchlist-section" class="watchlist-section">
+      <div class="watchlist-header">
+        <h2 class="watchlist-title">Watchlist</h2>
+        <div class="watchlist-tools">
+          <select class="sort-select" id="sort-select">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="title">A-Z Title</option>
+            <option value="price">By In-Store Price</option>
+          </select>
+          <button class="icon-btn" id="random-pick-btn" title="Random pick">🎲</button>
+        </div>
+      </div>
+      <div id="watchlist-content"></div>
+    </section>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="search">
+      <span class="nav-icon">🔍</span>
+      <span>Search</span>
+    </button>
+    <button class="nav-item" data-tab="watchlist">
+      <span class="nav-icon">📚</span>
+      <span>Watchlist</span>
+      <span class="nav-badge hidden" id="watchlist-badge">0</span>
+    </button>
+  </nav>
+
+  <div class="modal-overlay" id="watchlist-modal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">Save to Watchlist</h3>
+      <form class="modal-form" id="watchlist-form">
+        <div class="input-group">
+          <label for="modal-title">Title</label>
+          <input type="text" id="modal-title" required>
+        </div>
+        <div class="input-group">
+          <label for="modal-author">Author</label>
+          <input type="text" id="modal-author">
+        </div>
+        <div class="input-group">
+          <label for="modal-isbn">ISBN</label>
+          <input type="text" id="modal-isbn">
+        </div>
+        <div class="input-group">
+          <label for="modal-in-store">In-Store Price to Beat</label>
+          <input type="text" id="modal-in-store" placeholder="$18.99">
+        </div>
+        <div class="input-group">
+          <label for="modal-notes">Notes (optional)</label>
+          <input type="text" id="modal-notes" placeholder="e.g., Pevear translation">
+        </div>
+        <div class="input-group">
+          <label for="modal-edition">Edition Preferences (optional)</label>
+          <input type="text" id="modal-edition" placeholder="e.g., paperback only">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="random-pick-overlay" id="random-pick-overlay">
+    <div class="random-pick-card">
+      <div class="random-pick-emoji">📖</div>
+      <div class="random-pick-title" id="random-title">Book Title</div>
+      <div class="random-pick-author" id="random-author">by Author</div>
+      <button class="btn btn-primary" id="random-search-btn">Search This Book</button>
+      <button class="btn btn-secondary" style="margin-top: 0.5rem;" id="random-close-btn">Pick Another</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const AGGREGATORS = [
+      {
+        id: 'bookfinder', name: 'BookFinder', icon: 'BF',
+        note: 'Compares 100k+ sellers w/ shipping',
+        buildUrl: (t, a, i) => i 
+          ? `https://www.bookfinder.com/search/?isbn=${i}&mode=isbn&st=sr&ac=qr`
+          : `https://www.bookfinder.com/search/?title=${encodeURIComponent(t)}${a?`&author=${encodeURIComponent(a)}`:''}&new_used=U&destination=us&currency=USD&mode=basic&st=sr&ac=qr`
+      },
+      {
+        id: 'addall', name: 'AddALL', icon: 'AA',
+        note: 'Another powerful aggregator',
+        buildUrl: (t, a, i) => i
+          ? `https://used.addall.com/SuperRare/submitRare.cgi?isbn=${i}&match=exact`
+          : `https://used.addall.com/SuperRare/submitRare.cgi?keyword=${encodeURIComponent(a?`${a} / ${t}`:t)}&match=close`
+      }
+    ];
+
+    const PRIORITY_SITES = [
+      {
+        id: 'thriftbooks', name: 'ThriftBooks', icon: 'TB',
+        note: 'Free ship $15+ · Your #1', hasApi: false,
+        buildUrl: (t, a, i) => `https://www.thriftbooks.com/browse/?b.search=${encodeURIComponent(i||`${t} ${a}`.trim())}#b.s=mostPopular-desc&b.p=1&b.pp=30&b.oos`
+      },
+      {
+        id: 'abebooks', name: 'AbeBooks', icon: 'AB',
+        note: 'Wide selection · Intl sellers', hasApi: true,
+        buildUrl: (t, a, i) => i 
+          ? `https://www.abebooks.com/servlet/SearchResults?isbn=${i}&sortby=17`
+          : `https://www.abebooks.com/servlet/SearchResults?kn=${encodeURIComponent(t)}&sortby=17${a?`&an=${encodeURIComponent(a)}`:''}`
+      },
+      {
+        id: 'betterworldbooks', name: 'Better World Books', icon: 'BW',
+        note: 'Free ship · Donates books', hasApi: true,
+        buildUrl: (t, a, i) => `https://www.betterworldbooks.com/search/results?q=${encodeURIComponent(i||`${t} ${a}`.trim())}`
+      }
+    ];
+
+    const SECONDARY_SITES = [
+      {
+        id: 'alibris', name: 'Alibris', icon: 'AL', note: 'Rare & collectible',
+        buildUrl: (t, a, i) => i 
+          ? `https://www.alibris.com/booksearch?isbn=${i}`
+          : `https://www.alibris.com/booksearch?keyword=${encodeURIComponent(t)}&sort=p${a?`&author=${encodeURIComponent(a)}`:''}`
+      },
+      {
+        id: 'biblio', name: 'Biblio', icon: 'BI', note: '100M books · Indie sellers',
+        buildUrl: (t, a, i) => i
+          ? `https://www.biblio.com/search.php?isbn=${i}&order=price`
+          : `https://www.biblio.com/search.php?keyisbn=${encodeURIComponent(t)}&order=price${a?`&author=${encodeURIComponent(a)}`:''}`
+      },
+      {
+        id: 'halfpricebooks', name: 'Half Price Books', icon: 'HP', note: 'Good for recent releases',
+        buildUrl: (t, a, i) => `https://www.hpb.com/products?Ntt=${encodeURIComponent(i||`${t} ${a}`.trim())}`
+      }
+    ];
+
+    const EXTRA_SITES = [
+      { id: 'powells', name: "Powell's Books", icon: 'PW', note: 'Portland indie',
+        buildUrl: (t, a, i) => `https://www.powells.com/searchresults?keyword=${encodeURIComponent(i||`${t} ${a}`.trim())}` },
+      { id: 'secondsale', name: 'SecondSale', icon: 'SS', note: 'World of Books · Free $15+',
+        buildUrl: (t, a, i) => `https://www.secondsale.com/s?k=${encodeURIComponent(i||`${t} ${a}`.trim())}` },
+      { id: 'amazon', name: 'Amazon Used', icon: 'AZ', note: 'Check "Other Sellers"',
+        buildUrl: (t, a, i) => `https://www.amazon.com/s?k=${encodeURIComponent(i||`${t} ${a}`.trim())}&i=stripbooks&rh=p_n_condition-type%3A1294423011` },
+      { id: 'ebay', name: 'eBay Books', icon: 'EB', note: 'Auctions & Buy It Now',
+        buildUrl: (t, a, i) => `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(i||`${t} ${a}`.trim())}&_sacat=267&LH_BIN=1&_sop=15` },
+      { id: 'bookoutlet', name: 'Book Outlet', icon: 'BO', note: 'Bargain new books',
+        buildUrl: (t, a, i) => `https://bookoutlet.com/Store/Search?qf=All&q=${encodeURIComponent(i||`${t} ${a}`.trim())}` },
+      { id: 'goodwill', name: 'Goodwill Books', icon: 'GW', note: 'Thrift store finds',
+        buildUrl: (t, a, i) => `https://shopgoodwill.com/categories/listing?st=${encodeURIComponent(i||`${t} ${a}`.trim())}&sg=Books` }
+    ];
+
+    let currentSearch = { title: '', author: '', isbn: '', inStorePrice: null };
+    let currentBookData = null;
+    let watchlist = JSON.parse(localStorage.getItem('nicosBookWatchlist') || '[]');
+    let darkMode = localStorage.getItem('nicosBookDarkMode') === 'true';
+    let sitesExpanded = false;
+
+    const $ = id => document.getElementById(id);
+    const searchForm = $('search-form'), titleInput = $('title'), authorInput = $('author');
+    const isbnInput = $('isbn'), inStorePriceInput = $('in-store-price'), searchBtn = $('search-btn');
+    const resultsSection = $('results-section'), aggregatorCards = $('aggregator-cards');
+    const priorityCards = $('priority-cards'), secondaryCards = $('secondary-cards');
+    const moreSites = $('more-sites'), expandToggle = $('expand-toggle');
+    const expandText = $('expand-text'), expandIcon = $('expand-icon');
+    const inStoreTag = $('in-store-tag'), inStoreDisplay = $('in-store-display');
+    const addWatchlistBtn = $('add-watchlist-btn'), watchlistModal = $('watchlist-modal');
+    const watchlistForm = $('watchlist-form'), modalCancel = $('modal-cancel');
+    const watchlistContent = $('watchlist-content'), watchlistBadge = $('watchlist-badge');
+    const darkModeToggle = $('dark-mode-toggle'), sortSelect = $('sort-select');
+    const randomPickBtn = $('random-pick-btn'), randomPickOverlay = $('random-pick-overlay');
+    const toast = $('toast'), navItems = document.querySelectorAll('.nav-item');
+
+    function init() {
+      if (darkMode) document.body.classList.add('dark-mode');
+      updateDarkModeIcon();
+      updateWatchlistBadge();
+      searchForm.addEventListener('submit', handleSearch);
+      navItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+      darkModeToggle.addEventListener('click', toggleDarkMode);
+      addWatchlistBtn.addEventListener('click', openWatchlistModal);
+      modalCancel.addEventListener('click', closeWatchlistModal);
+      watchlistModal.addEventListener('click', e => { if (e.target === watchlistModal) closeWatchlistModal(); });
+      watchlistForm.addEventListener('submit', handleWatchlistSubmit);
+      sortSelect.addEventListener('change', renderWatchlist);
+      randomPickBtn.addEventListener('click', showRandomPick);
+      $('random-close-btn').addEventListener('click', showRandomPick);
+      $('random-search-btn').addEventListener('click', searchRandomPick);
+      randomPickOverlay.addEventListener('click', e => { if (e.target === randomPickOverlay) randomPickOverlay.classList.remove('active'); });
+      expandToggle.addEventListener('click', toggleMoreSites);
+    }
+
+    async function handleSearch(e) {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const author = authorInput.value.trim();
+      const isbn = isbnInput.value.trim().replace(/[-\s]/g, '');
+      const inStorePrice = parsePrice(inStorePriceInput.value);
+
+      if (!title && !isbn) { showToast('Please enter a title or ISBN'); return; }
+
+      currentSearch = { title, author, isbn, inStorePrice };
+      searchBtn.disabled = true;
+      searchBtn.innerHTML = '<span class="spinner"></span> Searching...';
+
+      try {
+        const bookData = await fetchBookMetadata(title, author, isbn);
+        currentBookData = bookData;
+        updateBookInfoDisplay(bookData);
+
+        inStoreTag.classList.toggle('hidden', !inStorePrice);
+        if (inStorePrice) inStoreDisplay.textContent = formatPrice(inStorePrice);
+
+        let apiPrices = {};
+        if (bookData.isbn) apiPrices = await fetchApiPrices(bookData.isbn);
+
+        renderSiteCards(AGGREGATORS, aggregatorCards, bookData, apiPrices, true);
+        renderSiteCards(PRIORITY_SITES, priorityCards, bookData, apiPrices, false, true);
+        renderSiteCards(SECONDARY_SITES, secondaryCards, bookData, apiPrices);
+        renderSiteCards(EXTRA_SITES, moreSites, bookData, apiPrices);
+
+        expandText.textContent = sitesExpanded ? 'Show fewer sites' : `Show ${EXTRA_SITES.length} more sites`;
+        expandIcon.textContent = sitesExpanded ? '▲' : '▼';
+
+        resultsSection.classList.add('active');
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (error) {
+        console.error('Search error:', error);
+        showToast('Search failed. Please try again.');
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = '<span>🔍</span> Search Prices';
+      }
+    }
+
+    async function fetchBookMetadata(title, author, isbn) {
+      const query = isbn ? `isbn:${isbn}` : title + (author ? `+inauthor:${author}` : '');
+      try {
+        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`);
+        const data = await res.json();
+        if (data.items?.[0]) {
+          const book = data.items[0].volumeInfo;
+          const ids = book.industryIdentifiers || [];
+          return {
+            title: book.title || title,
+            author: book.authors?.join(', ') || author,
+            isbn: isbn || ids.find(i => i.type === 'ISBN_13')?.identifier || ids.find(i => i.type === 'ISBN_10')?.identifier || '',
+            cover: book.imageLinks?.thumbnail?.replace('http:', 'https:') || null
+          };
+        }
+      } catch (err) { console.error('Google Books API error:', err); }
+      return { title, author, isbn, cover: null };
+    }
+
+    function updateBookInfoDisplay(bookData) {
+      $('result-title').textContent = bookData.title || 'Unknown Title';
+      $('result-author').textContent = bookData.author ? `by ${bookData.author}` : '';
+      $('result-isbn').textContent = bookData.isbn ? `ISBN: ${bookData.isbn}` : '';
+      $('book-cover').innerHTML = bookData.cover ? `<img src="${bookData.cover}" alt="Cover">` : '📚';
+    }
+
+    async function fetchApiPrices(isbn) {
+      const prices = {};
+      try {
+        const res = await fetch(`https://openlibrary.org/prices?isbn=${isbn}`);
+        const data = await res.json();
+        if (data.betterworldbooks?.price_amt) {
+          prices.betterworldbooks = { price: parseFloat(data.betterworldbooks.price_amt), condition: data.betterworldbooks.qlt || 'used' };
+        }
+      } catch (err) { console.log('Open Library API unavailable'); }
+      return prices;
+    }
+
+    function renderSiteCards(sites, container, bookData, apiPrices, isAgg = false, isPri = false) {
+      const inStore = currentSearch.inStorePrice;
+      container.innerHTML = sites.map(site => {
+        const url = site.buildUrl(bookData.title, bookData.author, bookData.isbn);
+        const pd = apiPrices[site.id];
+        const savings = inStore && pd?.price ? inStore - pd.price : null;
+        let cls = 'price-card' + (isAgg ? ' aggregator' : '') + (pd?.price ? ' has-price' : '');
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${cls}">
+          <div class="price-left">
+            <div class="site-icon">${site.icon}</div>
+            <div class="site-info">
+              <div class="site-name">${site.name}${isPri ? '<span class="priority-dot"></span>' : ''}</div>
+              <div class="site-note">${site.note}</div>
+            </div>
+          </div>
+          <div class="price-right">
+            ${pd?.price
+              ? `<span class="price-value">${formatPrice(pd.price)}</span>
+                 <span class="price-condition">${pd.condition}</span>
+                 ${savings > 0 ? `<span class="price-savings">Save ${formatPrice(savings)}</span>` : ''}`
+              : `<span class="price-value click">Check →</span>`}
+          </div>
+        </a>`;
+      }).join('');
+    }
+
+    function toggleMoreSites() {
+      sitesExpanded = !sitesExpanded;
+      moreSites.classList.toggle('expanded', sitesExpanded);
+      expandText.textContent = sitesExpanded ? 'Show fewer' : `Show ${EXTRA_SITES.length} more`;
+      expandIcon.textContent = sitesExpanded ? '▲' : '▼';
+    }
+
+    function openWatchlistModal() {
+      $('modal-title').value = currentBookData?.title || currentSearch.title;
+      $('modal-author').value = currentBookData?.author || currentSearch.author;
+      $('modal-isbn').value = currentBookData?.isbn || currentSearch.isbn;
+      $('modal-in-store').value = currentSearch.inStorePrice ? formatPrice(currentSearch.inStorePrice) : '';
+      $('modal-notes').value = '';
+      $('modal-edition').value = '';
+      watchlistModal.classList.add('active');
+    }
+
+    function closeWatchlistModal() { watchlistModal.classList.remove('active'); }
+
+    function handleWatchlistSubmit(e) {
+      e.preventDefault();
+      watchlist.push({
+        id: Date.now(),
+        title: $('modal-title').value.trim(),
+        author: $('modal-author').value.trim(),
+        isbn: $('modal-isbn').value.trim(),
+        inStorePrice: parsePrice($('modal-in-store').value),
+        notes: $('modal-notes').value.trim(),
+        edition: $('modal-edition').value.trim(),
+        cover: currentBookData?.cover || null,
+        dateAdded: new Date().toISOString(),
+        lastChecked: new Date().toISOString()
+      });
+      saveWatchlist();
+      closeWatchlistModal();
+      showToast('Added to watchlist!');
+      updateWatchlistBadge();
+    }
+
+    function saveWatchlist() { localStorage.setItem('nicosBookWatchlist', JSON.stringify(watchlist)); }
+    function updateWatchlistBadge() {
+      watchlistBadge.textContent = watchlist.length;
+      watchlistBadge.classList.toggle('hidden', !watchlist.length);
+    }
+
+    function renderWatchlist() {
+      if (!watchlist.length) {
+        watchlistContent.innerHTML = `<div class="watchlist-empty"><div class="watchlist-empty-icon">📚</div><p>Your watchlist is empty</p><p style="margin-top:0.5rem;font-size:0.9rem;">Search for books and save them here</p></div>`;
+        return;
+      }
+      const sorted = [...watchlist].sort((a, b) => {
+        switch (sortSelect.value) {
+          case 'date-asc': return new Date(a.dateAdded) - new Date(b.dateAdded);
+          case 'title': return a.title.localeCompare(b.title);
+          case 'price': return (b.inStorePrice || 0) - (a.inStorePrice || 0);
+          default: return new Date(b.dateAdded) - new Date(a.dateAdded);
+        }
+      });
+      watchlistContent.innerHTML = `<div class="watchlist-items">${sorted.map(item => `
+        <div class="watchlist-item">
+          <div class="watchlist-item-header">
+            <div>
+              <div class="watchlist-item-title">${escapeHtml(item.title)}</div>
+              ${item.author ? `<div class="watchlist-item-author">by ${escapeHtml(item.author)}</div>` : ''}
+            </div>
+            <div class="watchlist-actions">
+              <button class="watchlist-btn" onclick="searchWatchlistItem(${item.id})" title="Search">🔍</button>
+              <button class="watchlist-btn danger" onclick="removeFromWatchlist(${item.id})" title="Remove">✕</button>
+            </div>
+          </div>
+          <div class="watchlist-item-meta">
+            ${item.inStorePrice ? `<span class="meta-tag in-store">🏷️ Beat: ${formatPrice(item.inStorePrice)}</span>` : ''}
+            <span class="meta-tag">Checked: ${formatDate(item.lastChecked)}</span>
+          </div>
+          ${item.notes ? `<div class="watchlist-note">"${escapeHtml(item.notes)}"</div>` : ''}
+          ${item.edition ? `<div class="watchlist-note">Edition: ${escapeHtml(item.edition)}</div>` : ''}
+        </div>
+      `).join('')}</div>`;
+    }
+
+    function searchWatchlistItem(id) {
+      const item = watchlist.find(w => w.id === id);
+      if (!item) return;
+      item.lastChecked = new Date().toISOString();
+      saveWatchlist();
+      titleInput.value = item.title;
+      authorInput.value = item.author || '';
+      isbnInput.value = item.isbn || '';
+      inStorePriceInput.value = item.inStorePrice ? formatPrice(item.inStorePrice) : '';
+      switchTab('search');
+      searchForm.dispatchEvent(new Event('submit'));
+    }
+
+    function removeFromWatchlist(id) {
+      watchlist = watchlist.filter(w => w.id !== id);
+      saveWatchlist();
+      renderWatchlist();
+      updateWatchlistBadge();
+      showToast('Removed from watchlist');
+    }
+
+    let currentRandomItem = null;
+    function showRandomPick() {
+      if (!watchlist.length) { showToast('Add books first!'); return; }
+      currentRandomItem = watchlist[Math.floor(Math.random() * watchlist.length)];
+      $('random-title').textContent = currentRandomItem.title;
+      $('random-author').textContent = currentRandomItem.author ? `by ${currentRandomItem.author}` : '';
+      randomPickOverlay.classList.add('active');
+    }
+    function searchRandomPick() {
+      if (!currentRandomItem) return;
+      randomPickOverlay.classList.remove('active');
+      searchWatchlistItem(currentRandomItem.id);
+    }
+
+    function switchTab(tab) {
+      navItems.forEach(i => i.classList.toggle('active', i.dataset.tab === tab));
+      $('search-section').style.display = tab === 'search' ? 'block' : 'none';
+      $('watchlist-section').classList.toggle('active', tab === 'watchlist');
+      if (tab === 'watchlist') renderWatchlist();
+    }
+
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+      localStorage.setItem('nicosBookDarkMode', darkMode);
+      updateDarkModeIcon();
+    }
+    function updateDarkModeIcon() { darkModeToggle.textContent = darkMode ? '☀️' : '🌙'; }
+    function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+    function parsePrice(s) { if (!s) return null; const p = parseFloat(s.replace(/[^0-9.]/g, '')); return isNaN(p) ? null : p; }
+    function formatPrice(p) { return p != null ? '$' + p.toFixed(2) : ''; }
+    function formatDate(d) {
+      const diff = Date.now() - new Date(d), mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(diff / 3600000);
+      if (hrs < 24) return `${hrs}h ago`;
+      const days = Math.floor(diff / 86400000);
+      return days < 7 ? `${days}d ago` : new Date(d).toLocaleDateString();
+    }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    window.searchWatchlistItem = searchWatchlistItem;
+    window.removeFromWatchlist = removeFromWatchlist;
+    init();
+  </script>
+</body>
+</html>
